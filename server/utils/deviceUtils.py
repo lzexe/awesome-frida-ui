@@ -19,6 +19,9 @@ class DeviceUtil(object):
         self.device_id: str = None
         self.process: Process = None
         self.package_name: str = None
+        self.script = None
+        self.script_content: str = None
+        self.session = None
 
         if device_id:
             self.setup_device(device_id=device_id)
@@ -51,9 +54,18 @@ class DeviceUtil(object):
             _process: Process = process
             if _process.name == package_name:
                 proc = _process
+                self.session = self.device.attach(proc.pid)
                 break
         if not proc:
-            self.device.spawn([package_name])
+            pid = self.device.spawn([package_name])
+            self.session = self.device.attach(pid)
+
+            for process in self.enumerate_process():
+                _process: Process = process
+                if _process.name == package_name:
+                    proc = _process
+                    self.session = self.device.attach(proc.pid)
+                    break
 
         self.process = proc
 
@@ -73,4 +85,10 @@ class DeviceUtil(object):
         return json.dumps(data)
 
     def attach_process_and_load_script(self, script_content):
-        pass
+        if script_content:
+            if not self.process:
+                if self.package_name:
+                    self.setup_process(self.package_name)
+            if self.session:
+                pass
+

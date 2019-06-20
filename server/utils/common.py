@@ -4,6 +4,8 @@
 # @Author: smartdone
 # @Date:   2019-06-19 16:56
 
+import colorlog
+from colorlog import ColoredFormatter
 
 # 注解，用来限制类只生成一个实例
 def singleton(cls):
@@ -59,3 +61,25 @@ def compare_processes(a, b):
         return -1
     else:
         return 1
+
+
+handler = colorlog.StreamHandler()
+
+formatter = ColoredFormatter(
+    "%(log_color)s[%(asctime)s] [%(levelname)s]%(reset)s %(message)s",
+    datefmt="%H:%M:%S",
+    reset=True,
+    log_colors={
+        "DEBUG": "cyan",
+        "INFO": "green",
+        "WARNING": "yellow",
+        "ERROR": "red",
+        "CRITICAL": "red,bg_white",
+    }
+)
+
+handler.setFormatter(formatter)
+
+logger = colorlog.getLogger("Awesome-frida-ui")
+logger.addHandler(handler)
+logger.level = 10  # DEBUG
