@@ -13,6 +13,99 @@ const { SubMenu } = Menu;
 const data = [];
 
 /**
+ *Through filterDropdown custom column filtering function, and implement a search column way
+ *
+ */
+class Footer extends React.Component {
+    state = {
+        searchText: '',
+      };
+      getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            
+          <div style={{ padding: 8 }}>
+            <Input
+              ref={node => {
+                this.searchInput = node;
+              }}
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Button
+              type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+        filterIcon: filtered => (
+          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+          record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase()),
+        onFilterDropdownVisibleChange: visible => {
+          if (visible) {
+            setTimeout(() => this.searchInput.select());
+          }
+        },
+        render: text => (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[this.state.searchText]}
+            autoEscape
+            textToHighlight={text.toString()}
+          />
+        ),
+      });
+      handleSearch = (selectedKeys, confirm) => {
+        confirm();
+        this.setState({ searchText: selectedKeys[0] });
+      };
+    
+      handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+      };
+    render() {
+        const columns = [{
+            title: 'PID',
+            dataIndex: 'pid',
+            key: 'pid',
+            width: 300,
+            ...this.getColumnSearchProps('pid'),
+
+        }, {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            width: 300,
+            ...this.getColumnSearchProps('name'),
+
+        }];
+    
+      return (
+        <Table columns={columns} dataSource={data} pagination={{ pageSize: 50 }} scroll={{ y: 240 }} />
+      );
+    }
+  }
+
+export default Footer;
+
+
+/**
  * The layout of UI by Ant Design
  */
 class SiderDemo extends React.Component {
@@ -75,10 +168,9 @@ class SiderDemo extends React.Component {
  */
     getData() {
         var pdata = this.state.presp;
-        // alert(data)
-        //alert(data.length)
+        //alert(pdata)
+        alert("Please press GetProcess button again")
         for (var i = 0; i < pdata.length; i++) {
-
             data.push({
                 key: i,
                 pid: pdata[i][0],
@@ -90,91 +182,9 @@ class SiderDemo extends React.Component {
 
 
     }
-    state = {
-        searchText: '',
-    };
-
-/**
- *Through filterDropdown custom column filtering function, and implement a search column way
- *
- */
-getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
-                <Input
-                    ref={node => {
-                        this.searchInput = node;
-                    }}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
-                />
-                <Button
-                    type="primary"
-                    onClick={() => this.handleSearch(selectedKeys, confirm)}
-                    icon="search"
-                    size="small"
-                    style={{ width: 90, marginRight: 8 }}
-                >
-                    Search
-            </Button>
-                <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                    Reset
-            </Button>
-            </div>
-        ),
-        filterIcon: filtered => (
-            <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: visible => {
-            if (visible) {
-                setTimeout(() => this.searchInput.select());
-            }
-        },
-        render: text => (
-            <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[this.state.searchText]}
-                autoEscape
-                textToHighlight={text.toString()}
-            />
-        ),
-    });
-
-    handleSearch = (selectedKeys, confirm) => {
-        confirm();
-        this.setState({ searchText: selectedKeys[0] });
-    };
-
-    handleReset = clearFilters => {
-        clearFilters();
-        this.setState({ searchText: '' });
-    };
-
-
+    
 render() {
-        const columns = [{
-            title: 'PID',
-            dataIndex: 'pid',
-            key: 'pid',
-            width: 300,
-            ...this.getColumnSearchProps('pid'),
-
-        }, {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            width: 300,
-            ...this.getColumnSearchProps('name'),
-
-        }];
+        
         return (
 
 
@@ -294,9 +304,7 @@ render() {
                             DisplayData
             </button>
                         {/* <div>{this.state.presp}</div> */}
-
-
-                        <Table columns={columns} dataSource={data} pagination={{ pageSize: 50 }} scroll={{ y: 240 }} />
+                        <Footer />
                     </div>
 
 
@@ -307,7 +315,6 @@ render() {
         );
     }
 }
-
 
 
 ReactDOM.render(<SiderDemo />, document.getElementById('root'));
