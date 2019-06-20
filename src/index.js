@@ -114,7 +114,7 @@ class SiderDemo extends React.Component {
         current: '1',
         visiable: false,
         tab: 0,
-        pid: null,
+        ppid: null,
         resp: null,
         presp: null,
         funcname: null,
@@ -153,7 +153,7 @@ class SiderDemo extends React.Component {
 
     onSubmit() {
         axios.get(`http://127.0.0.1:8000/admin/?
-    pid=${this.state.pid}
+    &ppid=${this.state.ppid}
     &funcname=${this.state.funcname}
     &funcaddr=${this.state.funcaddr}
     &processname=${this.state.processname}`)
@@ -272,8 +272,8 @@ render() {
 
                     {
                         this.state.tab == 0 ? (<div id='Native' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
-                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.pid} onChange={e => this.setState({
-                                pid: e.target.value
+                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.ppid} onChange={e => this.setState({
+                                ppid: e.target.value
                             })} style={{ width: 300 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <Input.Search enterButton="Submit" addonBefore="FuncName:" value={this.state.funcname} onChange={e => this.setState({
                                 funcname: e.target.value
@@ -282,17 +282,21 @@ render() {
                                 processname: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <div>{this.state.resp}</div>
-                        </div>) : (this.state.tab == 1 ? <div id='Inline' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
-                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.pid} onChange={e => this.setState({
-                                pid: e.target.value
+                        </div>) : this.state.tab == 1 ? (<div id='Inline' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.ppid} onChange={e => this.setState({
+                                ppid: e.target.value
                             })} style={{ width: 300 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <Input.Search enterButton="Submit" addonBefore="FuncAddr:" value={this.state.funcaddr} onChange={e => this.setState({
                                 funcaddr: e.target.value
-                            })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} /></div>
-                            : <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                            })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
+                            <div>{this.state.resp}</div>
+                            </div>
+                            
+                            ) : ( <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
                                 <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
                                     processname: e.target.value
                                 })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
+                                <div>{this.state.resp}</div>
                             </div>)
                     }
 
