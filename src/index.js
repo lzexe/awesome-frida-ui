@@ -13,6 +13,99 @@ const { SubMenu } = Menu;
 const data = [];
 
 /**
+ *Through filterDropdown custom column filtering function, and implement a search column way
+ *
+ */
+class Footer extends React.Component {
+    state = {
+        searchText: '',
+      };
+      getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            
+          <div style={{ padding: 8 }}>
+            <Input
+              ref={node => {
+                this.searchInput = node;
+              }}
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Button
+              type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm)}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+        filterIcon: filtered => (
+          <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+          record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase()),
+        onFilterDropdownVisibleChange: visible => {
+          if (visible) {
+            setTimeout(() => this.searchInput.select());
+          }
+        },
+        render: text => (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[this.state.searchText]}
+            autoEscape
+            textToHighlight={text.toString()}
+          />
+        ),
+      });
+      handleSearch = (selectedKeys, confirm) => {
+        confirm();
+        this.setState({ searchText: selectedKeys[0] });
+      };
+    
+      handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+      };
+    render() {
+        const columns = [{
+            title: 'PID',
+            dataIndex: 'pid',
+            key: 'pid',
+            width: 300,
+            ...this.getColumnSearchProps('pid'),
+
+        }, {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            width: 300,
+            ...this.getColumnSearchProps('name'),
+
+        }];
+    
+      return (
+        <Table columns={columns} dataSource={data} pagination={{ pageSize: 50 }} scroll={{ y: 240 }} />
+      );
+    }
+  }
+
+export default Footer;
+
+
+/**
  * The layout of UI by Ant Design
  */
 class SiderDemo extends React.Component {
@@ -21,7 +114,7 @@ class SiderDemo extends React.Component {
         current: '1',
         visiable: false,
         tab: 0,
-        pid: null,
+        ppid: null,
         resp: null,
         presp: null,
         funcname: null,
@@ -60,7 +153,7 @@ class SiderDemo extends React.Component {
 
     onSubmit() {
         axios.get(`http://127.0.0.1:8000/admin/?
-    pid=${this.state.pid}
+    &ppid=${this.state.ppid}
     &funcname=${this.state.funcname}
     &funcaddr=${this.state.funcaddr}
     &processname=${this.state.processname}`)
@@ -75,10 +168,9 @@ class SiderDemo extends React.Component {
  */
     getData() {
         var pdata = this.state.presp;
-        // alert(data)
-        //alert(data.length)
+        //alert(pdata)
+        alert("Please press GetProcess button again")
         for (var i = 0; i < pdata.length; i++) {
-
             data.push({
                 key: i,
                 pid: pdata[i][0],
@@ -90,91 +182,9 @@ class SiderDemo extends React.Component {
 
 
     }
-    state = {
-        searchText: '',
-    };
-
-/**
- *Through filterDropdown custom column filtering function, and implement a search column way
- *
- */
-getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
-                <Input
-                    ref={node => {
-                        this.searchInput = node;
-                    }}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
-                />
-                <Button
-                    type="primary"
-                    onClick={() => this.handleSearch(selectedKeys, confirm)}
-                    icon="search"
-                    size="small"
-                    style={{ width: 90, marginRight: 8 }}
-                >
-                    Search
-            </Button>
-                <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                    Reset
-            </Button>
-            </div>
-        ),
-        filterIcon: filtered => (
-            <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: visible => {
-            if (visible) {
-                setTimeout(() => this.searchInput.select());
-            }
-        },
-        render: text => (
-            <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[this.state.searchText]}
-                autoEscape
-                textToHighlight={text.toString()}
-            />
-        ),
-    });
-
-    handleSearch = (selectedKeys, confirm) => {
-        confirm();
-        this.setState({ searchText: selectedKeys[0] });
-    };
-
-    handleReset = clearFilters => {
-        clearFilters();
-        this.setState({ searchText: '' });
-    };
-
-
+    
 render() {
-        const columns = [{
-            title: 'PID',
-            dataIndex: 'pid',
-            key: 'pid',
-            width: 300,
-            ...this.getColumnSearchProps('pid'),
-
-        }, {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            width: 300,
-            ...this.getColumnSearchProps('name'),
-
-        }];
+        
         return (
 
 
@@ -262,8 +272,8 @@ render() {
 
                     {
                         this.state.tab == 0 ? (<div id='Native' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
-                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.pid} onChange={e => this.setState({
-                                pid: e.target.value
+                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.ppid} onChange={e => this.setState({
+                                ppid: e.target.value
                             })} style={{ width: 300 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <Input.Search enterButton="Submit" addonBefore="FuncName:" value={this.state.funcname} onChange={e => this.setState({
                                 funcname: e.target.value
@@ -272,17 +282,21 @@ render() {
                                 processname: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <div>{this.state.resp}</div>
-                        </div>) : (this.state.tab == 1 ? <div id='Inline' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
-                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.pid} onChange={e => this.setState({
-                                pid: e.target.value
+                        </div>) : this.state.tab == 1 ? (<div id='Inline' style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                            <Input.Search enterButton="Submit" addonBefore="PID:" value={this.state.ppid} onChange={e => this.setState({
+                                ppid: e.target.value
                             })} style={{ width: 300 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
                             <Input.Search enterButton="Submit" addonBefore="FuncAddr:" value={this.state.funcaddr} onChange={e => this.setState({
                                 funcaddr: e.target.value
-                            })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} /></div>
-                            : <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                            })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
+                            <div>{this.state.resp}</div>
+                            </div>
+                            
+                            ) : ( <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
                                 <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
                                     processname: e.target.value
                                 })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
+                                <div>{this.state.resp}</div>
                             </div>)
                     }
 
@@ -294,9 +308,7 @@ render() {
                             DisplayData
             </button>
                         {/* <div>{this.state.presp}</div> */}
-
-
-                        <Table columns={columns} dataSource={data} pagination={{ pageSize: 50 }} scroll={{ y: 240 }} />
+                        <Footer />
                     </div>
 
 
@@ -307,7 +319,6 @@ render() {
         );
     }
 }
-
 
 
 ReactDOM.render(<SiderDemo />, document.getElementById('root'));

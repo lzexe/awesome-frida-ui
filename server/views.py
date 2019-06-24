@@ -6,7 +6,7 @@ from server import fridaFunc
 #processname = "what the fuck!!"
 def index(request):
     #global processname
-    pid = request.GET.get("pid")
+    pid = request.GET.get("ppid")
     funcname = request.GET.get("funcname")
     funcaddr = request.GET.get("funcaddr")
     processname = request.GET.get("processname")
