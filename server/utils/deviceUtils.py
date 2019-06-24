@@ -6,7 +6,7 @@
 
 from server.utils.common import singleton, cmp_to_key, compare_processes
 import frida
-from frida.core import Device
+from frida.core import Device, Session, Script
 from _frida import Process
 import json
 
@@ -19,9 +19,9 @@ class DeviceUtil(object):
         self.device_id: str = None
         self.process: Process = None
         self.package_name: str = None
-        self.script = None
+        self.script: Script = None
         self.script_content: str = None
-        self.session = None
+        self.session: Session = None
 
         if device_id:
             self.setup_device(device_id=device_id)
@@ -69,6 +69,20 @@ class DeviceUtil(object):
 
         self.process = proc
 
+    def spawn_process(self, package_name: str):
+        proc: Process = None
+        pid = self.device.spawn([package_name])
+        self.session = self.device.attach(pid)
+
+        for process in self.enumerate_process():
+            _process: Process = process
+            if _process.name == package_name:
+                proc = _process
+                self.session = self.device.attach(proc.pid)
+                break
+
+        self.process = proc
+
     def enumerate_process(self):
         processes = self.device.enumerate_processes()
         return processes
@@ -86,9 +100,13 @@ class DeviceUtil(object):
 
     def attach_process_and_load_script(self, script_content):
         if script_content:
+            self.script_content = script_content
             if not self.process:
                 if self.package_name:
                     self.setup_process(self.package_name)
             if self.session:
-                pass
+                if self.script:
+                    self.script.unload()
 
+                self.script = self.session.create_script(script_content)
+                # self.script.on()
