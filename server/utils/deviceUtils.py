@@ -10,6 +10,7 @@ from frida.core import Device, Session, Script
 from _frida import Process
 import json
 import time
+import os
 
 
 @singleton
@@ -116,7 +117,7 @@ class DeviceUtil(object):
         else:
             logger.debug("receive message: %s" % message)
 
-    def attach_process_and_load_script(self, script_content):
+    def attach_process_and_load_script(self, script_content: str):
         if script_content:
             self.script_content = script_content
             if not self.process:
@@ -132,3 +133,11 @@ class DeviceUtil(object):
                 self.script.on("message", self.on_message)
                 self.script.load()
                 logger.debug("load script success")
+
+    def attach_process_and_load_script_file(self, script_file):
+        if os.path.exists(script_file) and os.path.isfile(script_file):
+            with open(script_file, mode="r", encoding="utf-8") as f:
+                self.script_content = str(f.read())
+                self.attach_process_and_load_script(script_content=self.script_content)
+        else:
+            logger.error("script file does not exists")
