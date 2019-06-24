@@ -4,11 +4,12 @@
 # @Author: smartdone
 # @Date:   2019-06-19 16:56
 
-from server.utils.common import singleton, cmp_to_key, compare_processes
+from server.utils.common import singleton, cmp_to_key, compare_processes, logger
 import frida
 from frida.core import Device, Session, Script
 from _frida import Process
 import json
+import time
 
 
 @singleton
@@ -22,6 +23,8 @@ class DeviceUtil(object):
         self.script: Script = None
         self.script_content: str = None
         self.session: Session = None
+
+        self.messages = [] # 存储脚本send发送的数据
 
         if device_id:
             self.setup_device(device_id=device_id)
@@ -59,6 +62,8 @@ class DeviceUtil(object):
         if not proc:
             pid = self.device.spawn([package_name])
             self.session = self.device.attach(pid)
+            self.device.resume(pid)
+            time.sleep(1)
 
             for process in self.enumerate_process():
                 _process: Process = process
@@ -68,11 +73,14 @@ class DeviceUtil(object):
                     break
 
         self.process = proc
+        logger.debug("setup process, pid = %d, name = %s" % (proc.pid, proc.name))
 
     def spawn_process(self, package_name: str):
         proc: Process = None
         pid = self.device.spawn([package_name])
         self.session = self.device.attach(pid)
+        self.device.resume(pid)
+        time.sleep(1)
 
         for process in self.enumerate_process():
             _process: Process = process
@@ -82,6 +90,7 @@ class DeviceUtil(object):
                 break
 
         self.process = proc
+        logger.debug("spawn process, pid = %d, name = %s" % (proc.pid, proc.name))
 
     def enumerate_process(self):
         processes = self.device.enumerate_processes()
@@ -98,6 +107,14 @@ class DeviceUtil(object):
             data.append([_item.pid, _item.name])
         return json.dumps(data)
 
+    def on_message(self, message, data):
+        if message['type'] == 'send':
+            info = message.get("payload")
+            self.messages.append(info)
+            logger.debug("receive message: %s" % info)
+        else:
+            logger.debug("receive message: %s" % message)
+
     def attach_process_and_load_script(self, script_content):
         if script_content:
             self.script_content = script_content
@@ -109,4 +126,7 @@ class DeviceUtil(object):
                     self.script.unload()
 
                 self.script = self.session.create_script(script_content)
-                # self.script.on()
+                time.sleep(1)
+                self.messages.clear()
+                self.script.on("message", self.on_message)
+                self.script.load()
