@@ -24,7 +24,7 @@ class DeviceUtil(object):
         self.script_content: str = None
         self.session: Session = None
 
-        self.messages = [] # 存储脚本send发送的数据
+        self.messages = []  # 存储脚本send发送的数据
 
         if device_id:
             self.setup_device(device_id=device_id)
@@ -48,6 +48,7 @@ class DeviceUtil(object):
             device_manager = frida.get_device_manager()
             dev = device_manager.add_remote_device(remote)
             self.device = dev
+        logger.debug("setup device: name = %s, id = %s" % (self.device.name, self.device.id))
 
     def setup_process(self, package_name: str):  # 设置当前hook进程
         self.package_name = package_name
@@ -96,7 +97,7 @@ class DeviceUtil(object):
         processes = self.device.enumerate_processes()
         return processes
 
-    def processes_to_json_str(self, _processes=None):
+    def processes_to_json_str(self, _processes=None):  # 进程列表的一个json字符串
         if _processes:
             processes = _processes
         else:
@@ -130,3 +131,4 @@ class DeviceUtil(object):
                 self.messages.clear()
                 self.script.on("message", self.on_message)
                 self.script.load()
+                logger.debug("load script success")
