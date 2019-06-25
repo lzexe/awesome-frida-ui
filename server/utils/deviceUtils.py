@@ -111,7 +111,6 @@ class DeviceUtil(object):
             _process: Process = process
             if _process.name == package_name:
                 proc = _process
-                self.session = self.device.attach(proc.pid)
                 break
 
         self.process = proc
