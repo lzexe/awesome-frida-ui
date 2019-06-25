@@ -94,6 +94,37 @@ class DeviceUtil(object):
         self.process = proc
         logger.debug("spawn process, pid = %d, name = %s" % (proc.pid, proc.name))
 
+    def spawn_process_and_load_script(self, package_name: str, script_content: str):
+        proc: Process = None
+        pid = self.device.spawn([package_name])
+        self.session = self.device.attach(pid)
+        self.script_content = script_content
+        self.package_name = package_name
+        self.script = self.session.create_script(script_content)
+        self.messages.clear()
+        self.script.on("message", self.on_message)
+        self.script.load()
+        logger.debug("load script success")
+        self.device.resume(pid)
+
+        for process in self.enumerate_process():
+            _process: Process = process
+            if _process.name == package_name:
+                proc = _process
+                self.session = self.device.attach(proc.pid)
+                break
+
+        self.process = proc
+        logger.debug("spawn process, pid = %d, name = %s" % (proc.pid, proc.name))
+
+    def spawn_process_and_load_script_file(self, package_name: str, script_file: str):
+        if os.path.exists(script_file) and os.path.isfile(script_file):
+            with open(script_file, mode="r", encoding="utf-8") as f:
+                self.script_content = str(f.read())
+                self.spawn_process_and_load_script(package_name, self.script_content)
+        else:
+            logger.error("script file does not exists")
+
     def enumerate_process(self):
         processes = self.device.enumerate_processes()
         return processes
