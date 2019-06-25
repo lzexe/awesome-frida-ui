@@ -12,6 +12,7 @@ const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const data = [];
 
+
 /**
  *Through filterDropdown custom column filtering function, and implement a search column way
  *
@@ -117,6 +118,8 @@ class SiderDemo extends React.Component {
         ppid: null,
         resp: null,
         presp: null,
+        orresp: null,
+        adresp: null,
         funcname: null,
         funcaddr: null,
         processname: null,
@@ -161,6 +164,24 @@ class SiderDemo extends React.Component {
                 resp: data.data
             }))
             .catch(console.log("发送请求失败"));
+    }
+
+    onOrUnpack() {
+        axios.get(`http://127.0.0.1:8000/orUnpack/?
+        &processname=${this.state.processname}`)
+        .then(data => this.setState({
+            orresp: data.data
+        }))
+        .catch(console.log("发送请求失败"));
+    }
+
+    onAdUnpack() {
+        axios.get(`http://127.0.0.1:8000/adUnpack/?
+        &processname=${this.state.processname}`)
+        .then(data => this.setState({
+            adresp: data.data
+        }))
+        .catch(console.log("发送请求失败"));
     }
 
 /**
@@ -242,9 +263,9 @@ render() {
                                 </span>
                             }
                         >
-                            <Menu.Item key="9" onClick={() => this.onMenuClick(2)}>Android 4.X</Menu.Item>
-                            <Menu.Item key="10" onClick={() => this.onMenuClick(2)}>Android 7.X</Menu.Item>
-                            <Menu.Item key="11" onClick={() => this.onMenuClick(2)}>Android O&P</Menu.Item>
+                            <Menu.Item key="9" onClick={() => this.onMenuClick(2)}>Ordinary Unpack</Menu.Item>
+                            <Menu.Item key="10" onClick={() => this.onMenuClick()}>Advanced Unpack</Menu.Item>
+                           
 
                         </SubMenu>
                         <SubMenu
@@ -292,11 +313,16 @@ render() {
                             <div>{this.state.resp}</div>
                             </div>
                             
-                            ) : ( <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                            ) : this.state.tab == 2 ? ( <div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
                                 <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
                                     processname: e.target.value
-                                })} style={{ width: 600 }} size={"large"} onSearch={this.onSubmit.bind(this)} />
-                                <div>{this.state.resp}</div>
+                                })} style={{ width: 600 }} size={"large"} onSearch={this.onOrUnpack.bind(this)} />
+                                <div>{this.state.orresp}</div>
+                            </div>) : (<div style={{ border: "1px solid black", height: 450, width: 800 }} visiable={this.state.visiable}>
+                                <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
+                                    processname: e.target.value
+                                })} style={{ width: 600 }} size={"large"} onSearch={this.onAdUnpack.bind(this)} />
+                                <div>{this.state.adresp}</div>
                             </div>)
                     }
 

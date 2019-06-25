@@ -1,21 +1,19 @@
-import frida, sys
+import frida,sys
 import json
 
+
 '''Enumeration process list'''
-
-
 def enmuProcess():
     processes = frida.get_usb_device().enumerate_processes()
-    pid_column_width = max(map(lambda p: len("%d" % p.pid), processes))
-    line_format = "%" + str(pid_column_width) + "d  %s"
+    application = frida.get_usb_device().enumerate_applications()
     list = []
+    # for app in sorted(application, key=cmp_to_key(compare_applications)):
+    #     list.append([app.name, app.identifier])
     for process in sorted(processes, key=cmp_to_key(compare_processes)):
         list.append([process.pid, process.name])
         # process = line_format % (process.pid, process.name)
     list = json.dumps(list)
     return list
-
-
 def compare_processes(a, b):
     a_has_icon = a.get_small_icon() is not None
     b_has_icon = b.get_small_icon() is not None
@@ -31,6 +29,34 @@ def compare_processes(a, b):
     else:
         return 1
 
+def compare_applications(a, b):
+    a_is_running = a.pid != 0
+    b_is_running = b.pid != 0
+    if a_is_running == b_is_running:
+        if a.name > b.name:
+            return 1
+        elif a.name < b.name:
+            return -1
+        else:
+            return 0
+    elif a_is_running:
+        return -1
+    else:
+        return 1
+def compare_devices(a, b):
+    a_is_running = a.id != 0
+    b_is_running = b.id != 0
+    if a_is_running == b_is_running:
+        if a.name > b.name:
+            return 1
+        elif a.name < b.name:
+            return -1
+        else:
+            return 0
+    elif a_is_running:
+        return -1
+    else:
+        return 1
 
 def cmp_to_key(mycmp):
     "Convert a cmp= function into a key= function"
@@ -58,44 +84,16 @@ def cmp_to_key(mycmp):
             return mycmp(self.obj, other.obj) != 0
 
     return K
+def attchProcess(processname):
+    process = frida.get_usb_device().attch(processname)
+
+def enmuDevices():
+    devices = frida.enumerate_devices()
+
+    for device in sorted(devices, key=cmp_to_key(compare_devices)):
+        if device.id != 'local' and device.id != 'tcp':
+
+            return device.id
 
 
-'''Hook function example'''
 
-
-def crack(processName):
-    def on_message(message, data):
-        if message['type'] == 'send':
-            print("[*] {0}".format(message['payload']))
-        else:
-            print(message)
-
-    jscode = """
-    Java.perform(function () {
-        // Function to hook is defined here
-        var MainActivity = Java.use('com.example.seccon2015.rock_paper_scissors.MainActivity');
-
-        // Whenever button is clicked
-        MainActivity.onClick.implementation = function (v) {
-            // Show a message to know that the function got called
-            send('onClick');
-
-            // Call the original onClick handler
-            this.onClick(v);
-
-            // Set our values after running the original onClick handler
-            this.m.value = 0;
-            this.n.value = 1;
-            this.cnt.value = 999;
-
-            // Log to the console that it's done, and we should have the flag!
-            send('Done:' + JSON.stringify(this.cnt));
-        };
-    });
-    """
-    process = frida.get_usb_device().attach(processName)
-    script = process.create_script(jscode)
-    script.on('message', on_message)
-    print('[*] Running CTF')
-    script.load()
-    sys.stdin.read()

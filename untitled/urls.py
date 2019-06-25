@@ -20,5 +20,7 @@ from server import views
 
 urlpatterns = [
     path('admin/', views.index),
-    path('process/', views.getProcess)
+    path('process/', views.getProcess),
+    path('orUnpack/', views.onOrUnpack),
+    path('adUnpack', views.onAdUnpack)
 ]

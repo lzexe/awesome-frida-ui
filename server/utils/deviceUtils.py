@@ -34,10 +34,10 @@ class DeviceUtil(object):
                 self.setup_process(package_name=package_name)
                 self.package_name = package_name
 
-    @staticmethod
-    def get_devices():
-        devices = frida.enumerate_devices()
-        return devices
+    # @staticmethod
+    # def get_devices():
+    #     devices = frida.enumerate_devices()
+    #     return devices
 
     def setup_device(self, device_id: str = None, remote: str = None):  # remote传递格式 127.0.0.1:27042
         if not remote:  # 远程设备
@@ -114,7 +114,7 @@ class DeviceUtil(object):
                 break
 
         self.process = proc
-        logger.debug("spawn process, pid = %d, name = %s" % (proc.pid, proc.name))
+        # logger.debug("spawn process, pid = %d, name = %s" % (proc.pid, proc.name))
 
     def spawn_process_and_load_script_file(self, package_name: str, script_file: str):
         if os.path.exists(script_file) and os.path.isfile(script_file):
