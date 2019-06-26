@@ -22,5 +22,7 @@ urlpatterns = [
     path('admin/', views.index),
     path('process/', views.getProcess),
     path('orUnpack/', views.onOrUnpack),
-    path('adUnpack', views.onAdUnpack)
+    path('adUnpack/', views.onAdUnpack),
+    path('nativeHook/', views.onNativeHook),
+    path('inlineHook', views.onInlineHook)
 ]

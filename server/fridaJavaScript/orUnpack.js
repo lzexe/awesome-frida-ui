@@ -35,16 +35,16 @@ if(moduleOFunc == moduleFuncName || modulePFunc == moduleFuncName){
 			send("Hooked Function");
 			send("base: "+ args[1]);
 			send("size: "+ args[2].toInt32());
-			send(hexdump(
-				args[1],{
-					offset: 0,
-					length: 64,
-					header: true,
-					ansi: true
+			// send(hexdump(
+			// 	args[1],{
+			// 		offset: 0,
+			// 		length: 64,
+			// 		header: true,
+			// 		ansi: true
 
 
-				}
-				));
+			// 	}
+			// 	));
 			var begin = args[1];
 			send("magic : " + Memory.readUtf8String(begin))
 			var address = parseInt(begin,16) + 0x20;
