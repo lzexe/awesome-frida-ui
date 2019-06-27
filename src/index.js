@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Menu, Button, Icon, Input, Table } from 'antd';
+import { Layout, Menu, Button, Icon, Input, Table, List, ConfigProvider } from 'antd';
 import './index.css';
 import 'antd/dist/antd.css'
 import App from './App';
@@ -12,7 +12,20 @@ import Qs from 'qs';
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const data = [];
+// const hkdata = [];
 const { TextArea } = Input.Search;
+
+
+const customizeRenderEmpty = () => (
+    <div style={{ textAlign: 'center' }}>
+        <Icon type="smile" style={{ fontSize: 20 }} />
+        <p>Data Not Found</p>
+    </div>
+);
+
+const style = { width: 200 };
+
+
 
 
 /**
@@ -116,6 +129,7 @@ class SiderDemo extends React.Component {
         theme: 'dark',
         current: '1',
         visiable: false,
+        customize: false,
         tab: 0,
         ppid: null,
         resp: null,
@@ -123,6 +137,7 @@ class SiderDemo extends React.Component {
         orresp: null,
         adresp: null,
         hkresp: null,
+        hkinforesp: null,
         funcname: null,
         funcaddr: null,
         processname: null,
@@ -159,6 +174,15 @@ class SiderDemo extends React.Component {
             .catch(console.log("发送请求失败"));
 
 
+
+    }
+
+    onGetHookInfo(){
+        axios.get(`http://127.0.0.1:8000/hookinfo/`)
+        .then(data => this.setState({
+            hkinforesp: data.data
+        }))
+        .catch(console.log("发送请求失败"));
 
     }
 
@@ -305,7 +329,24 @@ class SiderDemo extends React.Component {
 
     }
 
+    // getHookInfo(){
+    //     var hdata = this.state.hkinforesp;
+    //     for (var i = 0; i < hdata.length; i++) {
+    //         hkdata.push({
+               
+    //             info: hdata[i]
+                
+    //         });
+
+
+    //     }
+
+
+
+    // }
+
     render() {
+        const { customize } = this.state;
 
         return (
 
@@ -364,8 +405,8 @@ class SiderDemo extends React.Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="9" onClick={() => this.onMenuClick(2)}>Ordinary Unpack</Menu.Item>
-                            <Menu.Item key="10" onClick={() => this.onMenuClick()}>Advanced Unpack</Menu.Item>
+                            <Menu.Item key="7" onClick={() => this.onMenuClick(2)}>Ordinary Unpack</Menu.Item>
+                            <Menu.Item key="8" onClick={() => this.onMenuClick()}>Advanced Unpack</Menu.Item>
 
 
                         </SubMenu>
@@ -378,14 +419,26 @@ class SiderDemo extends React.Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="12" onClick={() => this.onMenuClick()}>Process Func</Menu.Item>
-                            <Menu.Item key="13" onClick={() => this.onMenuClick()}>Module Func</Menu.Item>
-                            <Menu.Item key="14" onClick={() => this.onMenuClick()}>Memory Func</Menu.Item>
-                            <Menu.ItemGroup key="15" title="Java Function" >
-                                <Menu.Item key="1" onClick={() => this.onMenuClick(2)} >enumerateLoadedClasses</Menu.Item>
-                                <Menu.Item key="2" onClick={() => this.onMenuClick(2)} >enumerateClassLoaders</Menu.Item>
+                            <Menu.ItemGroup key="g3" title="Process Func" >
+                                <Menu.Item key="9" onClick={() => this.onMenuClick(2)} >findModuleByAddress</Menu.Item>
+                                <Menu.Item key="10" onClick={() => this.onMenuClick(2)} >findModuleByName</Menu.Item>
                             </Menu.ItemGroup>
-                            <Menu.Item key="16" onClick={() => this.onMenuClick()}>Interceptor Func</Menu.Item>
+                            <Menu.ItemGroup key="g4" title="Module Func" >
+                                <Menu.Item key="11" onClick={() => this.onMenuClick(2)} >findExportByName</Menu.Item>
+                                <Menu.Item key="12" onClick={() => this.onMenuClick(2)} >findBaseAddress</Menu.Item>
+                            </Menu.ItemGroup>
+                            <Menu.ItemGroup key="g5" title="Memory Func" >
+                                <Menu.Item key="13" onClick={() => this.onMenuClick(2)} >scan</Menu.Item>
+                                <Menu.Item key="14" onClick={() => this.onMenuClick(2)} >alloc</Menu.Item>
+                            </Menu.ItemGroup>
+                            <Menu.ItemGroup key="g6" title="Java Function" >
+                                <Menu.Item key="15" onClick={() => this.onMenuClick(2)} >enumerateLoadedClasses</Menu.Item>
+                                <Menu.Item key="16" onClick={() => this.onMenuClick(2)} >enumerateClassLoaders</Menu.Item>
+                            </Menu.ItemGroup>
+                            <Menu.ItemGroup key="g7" title="Interceptor Func" >
+                                <Menu.Item key="17" onClick={() => this.onMenuClick(2)} >attach</Menu.Item>
+                                <Menu.Item key="18" onClick={() => this.onMenuClick(2)} >replace</Menu.Item>
+                            </Menu.ItemGroup>
 
                         </SubMenu>
                     </Menu>
@@ -409,15 +462,27 @@ class SiderDemo extends React.Component {
                             <Input.Search enterButton="Submit" addonBefore="EnLogCode:" value={this.state.enlogcode} onChange={e => this.setState({
                                 enlogcode: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onNativeHook.bind(this)} />
-                            <div>{this.state.hkresp}</div>
+                            <div>
+                            <button onClick={this.onGetHookInfo.bind(this)}>GetHookInfo</button>
+                            {this.state.hkinforesp}
+                                {/* <ConfigProvider renderEmpty={customize && customizeRenderEmpty}>
+                                    <div className="config-provider">
+                                    
+                                    <button onClick={this.getHookInfo.bind(this)}>DispalyHookInfo</button>
+                                        <h3>Info List</h3>
+                                        <List dataSource={hkdata}/>
+                                        
+                                    </div>
+                                </ConfigProvider> */}
+                            </div>
                         </div>) : this.state.tab == 1 ? (<div id='Inline' style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
-                            <Input  addonBefore="ModuleName:" value={this.state.moduleName} onChange={e => this.setState({
+                            <Input addonBefore="ModuleName:" value={this.state.moduleName} onChange={e => this.setState({
                                 moduleName: e.target.value
                             })} style={{ width: 400 }} size={"large"} />
-                            <Input  addonBefore="ExportName:" value={this.state.exportName} onChange={e => this.setState({
+                            <Input addonBefore="ExportName:" value={this.state.exportName} onChange={e => this.setState({
                                 exportName: e.target.value
-                            })} style={{ width: 800 }} size={"large"} autosize={{ minRows: 2, maxRows: 6 }}/>
-                            <Input  addonBefore="EnLogCode:" value={this.state.enlogcode} onChange={e => this.setState({
+                            })} style={{ width: 800 }} size={"large"} autosize={{ minRows: 2, maxRows: 6 }} />
+                            <Input addonBefore="EnLogCode:" value={this.state.enlogcode} onChange={e => this.setState({
                                 enlogcode: e.target.value
                             })} style={{ width: 400 }} size={"large"} />
                             <Input.Search enterButton="Submit" addonBefore="LeLogCode:" value={this.state.lelogcode} onChange={e => this.setState({

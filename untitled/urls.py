@@ -24,5 +24,6 @@ urlpatterns = [
     path('orUnpack/', views.onOrUnpack),
     path('adUnpack/', views.onAdUnpack),
     path('nativeHook/', views.onNativeHook),
-    path('inlineHook', views.onInlineHook)
+    path('inlineHook/', views.onInlineHook),
+    path('hookinfo/',views.getHookInfo)
 ]

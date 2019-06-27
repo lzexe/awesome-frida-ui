@@ -15,6 +15,16 @@ def index(request):
 
     return HttpResponse(pid)
 
+def getHookInfo(request):
+    deviceutil = DeviceUtil()
+    message = deviceutil.messages
+    message = json.dumps(message)
+    print(message)
+    return HttpResponse(message, content_type="application/json,charset=utf-8")
+
+
+
+
 def getProcess(request):
     list = fridaFunc.enmuProcess()
 
@@ -27,10 +37,8 @@ def onOrUnpack(request):
         devices = fridaFunc.enmuDevices()
         deviceutil.setup_device(devices)
         deviceutil.spawn_process_and_load_script_file(processname,'./server/fridaJavaScript/orUnpack.js')
-        message = deviceutil.messages
-        # print(message)
-        message = json.dumps(message)
-        return HttpResponse(message, content_type="application/json,charset=utf-8")
+
+        return HttpResponse("OK")
 
 def onAdUnpack(request):
     processname = request.POST.get("processname")
@@ -39,10 +47,7 @@ def onAdUnpack(request):
         devices = fridaFunc.enmuDevices()
         deviceutil.setup_device(devices)
         deviceutil.spawn_process_and_load_script_file(processname,'./server/fridaJavaScript/adUnpack.js')
-        message = deviceutil.messages
-        # print(message)
-        message = json.dumps(message)
-        return HttpResponse(message, content_type="application/json,charset=utf-8")
+        return HttpResponse("OK")
 
 def onNativeHook(request):
     processname = request.POST.get("processname")
@@ -50,13 +55,13 @@ def onNativeHook(request):
     methodname = request.POST.get("classname")
     enlogcode = request.POST.get("enlogcode")
     nativeHookJs = formatJS.formatNativeHook(funcname,methodname,enlogcode)
-    print(nativeHookJs)
+    # print(nativeHookJs)
     deviceutil = DeviceUtil()
+    devices = fridaFunc.enmuDevices()
+    deviceutil.setup_device(devices)
     deviceutil.setup_process(processname)
     deviceutil.attach_process_and_load_script(nativeHookJs)
-    message = deviceutil.messages
-    message = json.dumps(message)
-    return HttpResponse(message, content_type="application/json,charset=utf-8")
+    return HttpResponse("OK")
 
 def onInlineHook(request):
     processname = request.POST.get("processname")
@@ -66,7 +71,10 @@ def onInlineHook(request):
     lelogcode = request.POST.get("lelogcode")
     inlineHookJs = formatJS.formatInlineHook(moduleName, exportName, enlogcode, lelogcode)
     deviceutil = DeviceUtil()
+    devices = fridaFunc.enmuDevices()
+    deviceutil.setup_device(devices)
     deviceutil.setup_process(processname)
     deviceutil.attach_process_and_load_script(inlineHookJs)
+    return HttpResponse("OK")
 
 
