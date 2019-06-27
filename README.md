@@ -2,6 +2,7 @@
 
 ## Introduction
 This project for Frida-UI and make frida easier to use.The project base on[Frida-RE](https://www.frida.re),[create-react-app](https://github.com/facebook/create-react-app),[Ant Design](https://github.com/ant-design/ant-design),[Django](https://github.com/django/django)<br>
+The project is still developing, maybe have some bug, so if you find some bug,please tell me on issues<br>
 
 ## UI
 ![style](https://github.com/viva-frida/awesome-frida-ui/blob/master/Image/newUI.png)
@@ -14,19 +15,25 @@ Make sure you have the following environment configuration:<br>
 * Node.js
 * NPM
 * Yarn
-* Django
+* Django<br>
+
 If not,you need to install Node.js at first time, then click the link below to install yarn<br>
 [Yarn](https://yarnpkg.com/en/docs/install#mac-stable)<br>
-next step by step document<br>
+
+* next step by step document<br>
     Enlish:(https://ant.design/docs/react/use-with-create-react-app)<br>
     中文:(https://ant.design/docs/react/use-with-create-react-app-cn)<br>
-Downloading the git source<br>
-[source](git@github.com:viva-frida/awesome-frida-ui.git)<br>
-then execute the following command<br>
+
+* Downloading the git source<br>
+source:(git@github.com:viva-frida/awesome-frida-ui.git)<br>
+
+* then execute the following command<br>
         npm install
         npm start
-then run the python commang<br>
+
+* then run the python commang<br>
         manage.py startproject
+
 ### Hook Example
 ![example](https://github.com/viva-frida/awesome-frida-ui/blob/master/Image/Hook.png)
 ### The end
