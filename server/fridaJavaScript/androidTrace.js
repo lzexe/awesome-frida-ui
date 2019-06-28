@@ -203,8 +203,8 @@ setTimeout(function() {{ // avoid java.lang.ClassNotFoundException
 	Java.perform(function() {{
 
 		send("first entering selector")
-		trace("{{classfuncname}}");
-		trace("{{modulefuncname}}");
+		trace("{classfuncname}");
+		trace("{modulefuncname}");
 		//trace("com.whatsapp.protocol");
 		//trace("exports:*!open*");
 		//trace("exports:*!write*");
