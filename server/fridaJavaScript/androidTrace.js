@@ -23,6 +23,7 @@
 // generic trace
 function trace(pattern)
 {{
+	if(pattern){{
 	var type = (pattern.toString().indexOf("!") === -1) ? "java" : "module";
 
 	if (type === "module") {{
@@ -72,6 +73,7 @@ function trace(pattern)
 				console.error(err);
 			}}
 		}}
+	}}
 	}}
 }}
 
