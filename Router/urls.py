@@ -26,5 +26,5 @@ urlpatterns = [
     path('nativeHook/', views.onNativeHook),
     path('inlineHook/', views.onInlineHook),
     path('hookinfo/', views.getHookInfo),
-    path('androidTrace', views.onAndroidTrace)
+    path('androidTrace/', views.onAndroidTrace)
 ]

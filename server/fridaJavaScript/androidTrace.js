@@ -10,31 +10,31 @@ var singlePrefix = "|----"
 
 // generic trace
 function trace(pattern)
-{
-    if(pattern) {
+{{
+    if(pattern) {{
         // indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置,未出现则返回-1
         var type = (pattern.toString().indexOf("!") === -1) ? "java" : "module";
 
-        if (type === "module") {
+        if (type === "module") {{
             send("is--module")
             // trace Module
             var res = new ApiResolver("module");
             var matches = res.enumerateMatchesSync(pattern);
             var targets = uniqBy(matches, JSON.stringify);
-            targets.forEach(function (target) {
+            targets.forEach(function (target) {{
                 traceModule(target.address, target.name);
-            });
+            }});
 
-        } else if (type === "java") {
+        }} else if (type === "java") {{
             send("is--java")
 
             // trace Java Class, 遍历加载的类，判断追踪的是否是类
             var found = false;
-            Java.enumerateLoadedClasses({
-                onMatch: function (aClass) {
+            Java.enumerateLoadedClasses({{
+                onMatch: function (aClass) {{
                     // send("is--java--1--"+aClass.toString())
 
-                    if (aClass.match(pattern)) {
+                    if (aClass.match(pattern)) {{
 
                         send("is--java--2--" + aClass.toString())
 
@@ -46,47 +46,47 @@ function trace(pattern)
                         send('(' + aClass.toString() + ')-----' + className.toString());
 
                         traceClass(className);
-                    }
-                },
-                onComplete: function () {
-                }
-            });
+                    }}
+                }},
+                onComplete: function () {{
+                }}
+            }});
 
             // trace Java Method， 追踪方法
-            if (!found) {
-                try {
+            if (!found) {{
+                try {{
                     send('trace---method---' + pattern.toString())
                     traceMethod(pattern);
-                }
-                catch (err) { // catch non existing classes/methods
+                }}
+                catch (err) {{ // catch non existing classes/methods
                     console.error(err);
-                }
-            }
-        }
-    }
-}
+                }}
+            }}
+        }}
+    }}
+}}
 
 // find and trace all methods declared in a Java Class
 function traceClass(targetClass)
-{
+{{
 	var hook = Java.use(targetClass);
 	var methods = hook.class.getDeclaredMethods();
 	hook.$dispose;
 
 	var parsedMethods = [];
-	methods.forEach(function(method) {
+	methods.forEach(function(method) {{
 		parsedMethods.push(method.toString().replace(targetClass + ".", "TOKEN").match(/\sTOKEN(.*)\(/)[1]);
-	});
+	}});
 
 	var targets = uniqBy(parsedMethods, JSON.stringify);
-	targets.forEach(function(targetMethod) {
+	targets.forEach(function(targetMethod) {{
 		traceMethod(targetClass + "." + targetMethod);
-	});
-}
+	}});
+}}
 
 // trace a specific Java Method
 function traceMethod(targetClassMethod)
-{
+{{
 	var delim = targetClassMethod.lastIndexOf(".");
 	if (delim === -1) return;
 
@@ -99,10 +99,10 @@ function traceMethod(targetClassMethod)
 
 	send("Tracing " + targetClassMethod + " [" + overloadCount + " overload(s)]");
 
-	for (var i = 0; i < overloadCount; i++) {
+	for (var i = 0; i < overloadCount; i++) {{
 
 		// hook方法
-		hook[targetMethod].overloads[i].implementation = function() {
+		hook[targetMethod].overloads[i].implementation = function() {{
 
 			var logContent_1 = "entered--"+targetClassMethod;
 
@@ -113,21 +113,21 @@ function traceMethod(targetClassMethod)
 			console.warn(prefixStr + logContent_1);
 
 			// print backtrace, 打印调用堆栈
-			// Java.perform(function() {
+			// Java.perform(function() {{
 			// 	var bt = Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Exception").$new());
 			// 	send(prefixStr +"Backtrace:" + bt);
-			// });
+			// }});
 
 			// print args
 			// if (arguments.length) send();
 
 			// 打印参数
 			for (var j = 0; j < arguments.length; j++)
-			{
+			{{
 				var tmpLogStr = prefixStr + "arg[" + j + "]: " + arguments[j];
 				send(tmpLogStr);
 				logContentArray.push(tmpLogStr);
-			}
+			}}
 
 			// print retval
 			var retval = this[targetMethod].apply(this, arguments); // rare crash (Frida bug?)
@@ -145,121 +145,121 @@ function traceMethod(targetClassMethod)
 
 
 			return retval;
-		}
-	}
-}
+		}}
+	}}
+}}
 
 // 获取打印前缀
 function gainLogPrefix(theArray)
-{
+{{
 	var lastIndex = theArray.length - 1;
 
 	if (lastIndex<0)
-	{
+	{{
 		return singlePrefix;
-	}
+	}}
 
 
 	for (var i = lastIndex; i >= 0; i--)
-	{
+	{{
 		var tmpLogContent = theArray[i];
 		var cIndex = tmpLogContent.indexOf("entered--");
 
 		if ( cIndex == -1)
-		{
+		{{
 			var cIndex2 = tmpLogContent.indexOf("exiting--");
 			if ( cIndex2 == -1)
-			{
+			{{
 				continue;
-			}
+			}}
 			else
-			{
+			{{
 				//与上个方法平级
 				var resultStr = tmpLogContent.slice(0,cIndex2);
 				return resultStr;
-			}
-		}
+			}}
+		}}
 		else
-		{
+		{{
 			//在上个方法的内部
 			var resultStr = singlePrefix + tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
 			// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 			return resultStr;
 
-		}
-	}
+		}}
+	}}
 
 
 	return "";
 
-}
+}}
 
 
 
 // 获取打印前缀
 function gainLogPrefix_Module(theArray,status)
-{
+{{
 	var lastIndex = theArray.length - 1;
 
 	if (lastIndex<0)
-	{
+	{{
 		return singlePrefix;
-	}
+	}}
 
 
 	for (var i = lastIndex; i >= 0; i--)
-	{
+	{{
 		var tmpLogContent = theArray[i];
 		var cIndex = tmpLogContent.indexOf("entered--");
 
 		if ( cIndex == -1)
-		{
+		{{
 			var cIndex2 = tmpLogContent.indexOf("exiting--");
 			if ( cIndex2 == -1)
-			{
+			{{
 				continue;
-			}
+			}}
 			else
-			{
+			{{
 				//与上个方法平级
 				var resultStr = tmpLogContent.slice(0,cIndex2);
 				return resultStr;
-			}
-		}
+			}}
+		}}
 		else
-		{
+		{{
 			if (tmpLogContent.indexOf(status)==-1)
-			{
+			{{
 				//与上一条输出 平级
 				var resultStr = tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
 				// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 				return resultStr;
-			}
+			}}
 			else
-			{
+			{{
 				//在上个方法的内部
 				var resultStr = singlePrefix + tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
 				// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 				return resultStr;
-			}
+			}}
 
-		}
-	}
+		}}
+	}}
 
 
 	return "";
 
-}
+}}
 
 // trace Module functions
 function traceModule(impl, name)
-{
+{{
 	send("Tracing " + name);
 
-	Interceptor.attach(impl, {
+	Interceptor.attach(impl, {{
 
 
-		onEnter: function(args) {
+		onEnter: function(args) {{
 
 
 			// debug only the intended calls
@@ -269,7 +269,7 @@ function traceModule(impl, name)
 			// if (filename.indexOf("my.interesting.file") !== -1) // inclusion list
 			this.flag = true;
 
-			if (this.flag) {
+			if (this.flag) {{
 				var prefixStr = gainLogPrefix_Module(logContentArray,"entered--");
 				// console.warn("\n*** entered " + name);
 
@@ -279,13 +279,13 @@ function traceModule(impl, name)
 
 				// print backtrace， 打印调用堆栈
 				// send("\nBacktrace:\n" + Thread.backtrace(this.context, Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join("\n"));
-			}
-		},
+			}}
+		}},
 
-		onLeave: function(retval) {
+		onLeave: function(retval) {{
 
 
-			if (this.flag) {
+			if (this.flag) {{
 
 				var prefixStr = gainLogPrefix_Module(logContentArray,"non6soidjs3kejf6sle8ifsjie");
 
@@ -301,21 +301,21 @@ function traceModule(impl, name)
 
 
 				// console.warn("\n*** exiting " + name);
-			}
-		}
+			}}
+		}}
 
-	});
-}
+	}});
+}}
 
 // remove duplicates from array
 function uniqBy(array, key)
-{
-        var seen = {};
-        return array.filter(function(item) {
+{{
+        var seen = {{}};
+        return array.filter(function(item) {{
                 var k = key(item);
                 return seen.hasOwnProperty(k) ? false : (seen[k] = true);
-        });
-}
+        }});
+}}
 
 // usage examples
 setTimeout(function() {{ // avoid java.lang.ClassNotFoundException
