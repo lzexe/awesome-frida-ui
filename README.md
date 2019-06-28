@@ -34,7 +34,7 @@ source:(git@github.com:viva-frida/awesome-frida-ui.git)<br>
         npm start<br>
 
 * then run the python commang<br>
-        manage.py startproject
+        python3 manage.py runserver
 
 ### Hook Example
 ![example](https://github.com/viva-frida/awesome-frida-ui/blob/master/Image/Hook.png)<br>
@@ -53,7 +53,7 @@ enjoy the reverse engineering :)
 You can import the project by Virtual Studio Code or Pycharm,and config the runtime environment<br>
 * server folder: The Server project
 * src folder: The Web Client project
-* untitled folder: The Server router
+* Router folder: The Server router
 
 
 ## Implement Function
