@@ -9,3 +9,9 @@ def formatInlineHook(moduleName,exportName,enlogcode,lelogcode):
         data = f.read()
         data = data.format(moduleName = moduleName, exportName = exportName, enlogcode = enlogcode, lelogcode = lelogcode)
         return data
+
+def formatAndroidTrace(classfuncname,modulefuncname):
+    with open('./server/fridaJavaScript/androidTrace.js', "r", encoding="utf-8") as f:
+        data = f.read()
+        data = data.format(classfuncname = classfuncname, modulefuncname = modulefuncname)
+        return data

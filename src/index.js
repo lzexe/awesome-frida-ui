@@ -138,6 +138,7 @@ class SiderDemo extends React.Component {
         adresp: null,
         hkresp: null,
         hkinforesp: null,
+        traceresp: null,
         funcname: null,
         funcaddr: null,
         processname: null,
@@ -146,7 +147,9 @@ class SiderDemo extends React.Component {
         moduleName: null,
         exportName: null,
         enlogcode: null,
-        lelogcode: null
+        lelogcode: null,
+        classfuncname: null,
+        modulefuncname: null
     };
     handleClick = e => {
         console.log('click ', e);
@@ -177,12 +180,12 @@ class SiderDemo extends React.Component {
 
     }
 
-    onGetHookInfo(){
+    onGetHookInfo() {
         axios.get(`http://127.0.0.1:8000/hookinfo/`)
-        .then(data => this.setState({
-            hkinforesp: data.data
-        }))
-        .catch(console.log("发送请求失败"));
+            .then(data => this.setState({
+                hkinforesp: data.data
+            }))
+            .catch(console.log("发送请求失败"));
 
     }
 
@@ -309,6 +312,32 @@ class SiderDemo extends React.Component {
             .catch(console.log("发送请求失败"));
     }
 
+    onAndroidTrace(){
+        axios({
+            url: 'http://127.0.0.1:8000/androidTrace/',
+            method: 'post',
+            transformRequest: [function (data) {
+                // 对 data 进行任意转换处理
+                return Qs.stringify(data)
+            }],
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: {
+                processname: this.state.processname,
+                classfuncname: this.state.classfuncname,
+                modulefuncname: this.state.modulefuncname,
+            }
+
+
+        })
+            .then(data => this.setState({
+                traceresp: data.data
+            }))
+            .catch(console.log("发送请求失败"));
+    }
+
+    
+
+
     /**
      * handle the Json data,get pid and process name
      */
@@ -333,9 +362,9 @@ class SiderDemo extends React.Component {
     //     var hdata = this.state.hkinforesp;
     //     for (var i = 0; i < hdata.length; i++) {
     //         hkdata.push({
-               
+
     //             info: hdata[i]
-                
+
     //         });
 
 
@@ -393,7 +422,7 @@ class SiderDemo extends React.Component {
                             }
                         >
                             <Menu.Item key="5" onClick={() => this.onMenuClick()}>Stack Trace</Menu.Item>
-                            <Menu.Item key="6">Tracer</Menu.Item>
+                            <Menu.Item key="6" onClick={() => this.onMenuClick()}>Nadroid Tracer</Menu.Item>
 
                         </SubMenu>
                         <SubMenu
@@ -406,7 +435,7 @@ class SiderDemo extends React.Component {
                             }
                         >
                             <Menu.Item key="7" onClick={() => this.onMenuClick(2)}>Ordinary Unpack</Menu.Item>
-                            <Menu.Item key="8" onClick={() => this.onMenuClick()}>Advanced Unpack</Menu.Item>
+                            <Menu.Item key="8" onClick={() => this.onMenuClick(3)}>Advanced Unpack</Menu.Item>
 
 
                         </SubMenu>
@@ -450,21 +479,23 @@ class SiderDemo extends React.Component {
 
                     {
                         this.state.tab == 0 ? (<div id='Native' style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
+                            <Input addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
+                                processname: e.target.value
+                            })} style={{ width: 600 }} size={"large"} />
                             <Input addonBefore="ClassName:" value={this.state.classname} onChange={e => this.setState({
                                 classname: e.target.value
                             })} style={{ width: 600 }} size={"large"} />
                             <Input addonBefore="FuncName:" value={this.state.funcname} onChange={e => this.setState({
                                 funcname: e.target.value
                             })} style={{ width: 600 }} size={"large"} />
-                            <Input addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
-                                processname: e.target.value
-                            })} style={{ width: 600 }} size={"large"} />
+
                             <Input.Search enterButton="Submit" addonBefore="EnLogCode:" value={this.state.enlogcode} onChange={e => this.setState({
                                 enlogcode: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onNativeHook.bind(this)} />
                             <div>
-                            <button onClick={this.onGetHookInfo.bind(this)}>GetHookInfo</button>
-                            {this.state.hkinforesp}
+                                <button onClick={this.onGetHookInfo.bind(this)}>GetHookInfo</button>
+                                <div>{this.state.hkresp}</div>
+                                {this.state.hkinforesp}
                                 {/* <ConfigProvider renderEmpty={customize && customizeRenderEmpty}>
                                     <div className="config-provider">
                                     
@@ -488,7 +519,11 @@ class SiderDemo extends React.Component {
                             <Input.Search enterButton="Submit" addonBefore="LeLogCode:" value={this.state.lelogcode} onChange={e => this.setState({
                                 lelogcode: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onInlineHook.bind(this)} />
-                            <div>{this.state.hkresp}</div>
+                            <div>
+                                <button onClick={this.onGetHookInfo.bind(this)}>GetHookInfo</button>
+                                <div>{this.state.hkresp}</div>
+                                {this.state.hkinforesp}
+                            </div>
                         </div>
 
                         ) : this.state.tab == 2 ? (<div style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
@@ -496,11 +531,26 @@ class SiderDemo extends React.Component {
                                 processname: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onOrUnpack.bind(this)} />
                             <div>{this.state.orresp}</div>
-                        </div>) : (<div style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
+                        </div>) : this.state.tab == 3 ?(<div style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
                             <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
                                 processname: e.target.value
                             })} style={{ width: 600 }} size={"large"} onSearch={this.onAdUnpack.bind(this)} />
                             <div>{this.state.adresp}</div>
+                        </div>) : (<div style={{ border: "1px solid black", height: 450, width: 1000 }} visiable={this.state.visiable}>
+                            <Input addonBefore="ModuleFuncName:" value={this.state.moduleName} onChange={e => this.setState({
+                                moduleName: e.target.value
+                            })} style={{ width: 600 }} size={"large"} />
+                            <Input addonBefore="ClassFuncName:" value={this.state.exportName} onChange={e => this.setState({
+                                exportName: e.target.value
+                            })} style={{ width: 600 }} size={"large"} autosize={{ minRows: 2, maxRows: 6 }} />
+                            <Input.Search enterButton="Submit" addonBefore="ProcessName:" value={this.state.processname} onChange={e => this.setState({
+                                processname: e.target.value
+                            })} style={{ width: 600 }} size={"large"} onSearch={this.onAndroidTrace.bind(this)} />
+                            <div>
+                                <button onClick={this.onGetHookInfo.bind(this)}>GetTraceInfo</button>
+                                <div>{this.state.traceresp}</div>
+                                {this.state.hkinforesp}
+                            </div>
                         </div>)
                     }
 

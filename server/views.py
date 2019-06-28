@@ -77,4 +77,14 @@ def onInlineHook(request):
     deviceutil.attach_process_and_load_script(inlineHookJs)
     return HttpResponse("OK")
 
+def onAndroidTrace(request):
+    processname = request.POST.get("processname")
+    classfuncname = request.POST.get("classfuncname")
+    modulefuncname = request.POST.get("modulefuncname")
+    androidTraceJs = formatJS.formatAndroidTrace(classfuncname, modulefuncname)
+    deviceutil = DeviceUtil()
+    devices = fridaFunc.enmuDevices()
+    deviceutil.setup_device(devices)
+    deviceutil.spawn_process_and_load_script(processname,androidTraceJs)
+    return HttpResponse("OK")
 

@@ -25,5 +25,6 @@ urlpatterns = [
     path('adUnpack/', views.onAdUnpack),
     path('nativeHook/', views.onNativeHook),
     path('inlineHook/', views.onInlineHook),
-    path('hookinfo/',views.getHookInfo)
+    path('hookinfo/', views.getHookInfo),
+    path('androidTrace', views.onAndroidTrace)
 ]

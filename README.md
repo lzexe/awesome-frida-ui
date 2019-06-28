@@ -1,4 +1,6 @@
-# awesome-frida-ui
+# Awesome-Frida-UI
+
+Many thanks to @oleavr @smartdone @luoyanbei<br>
 
 ## Introduction
 This project for Frida-UI and make frida easier to use.The project base on[Frida-RE](https://www.frida.re),[create-react-app](https://github.com/facebook/create-react-app),[Ant Design](https://github.com/ant-design/ant-design),[Django](https://github.com/django/django)<br>
