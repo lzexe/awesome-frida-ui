@@ -16,7 +16,7 @@ function trace(pattern)
         var type = (pattern.toString().indexOf("!") === -1) ? "java" : "module";
 
         if (type === "module") {
-            console.log("is--module")
+            send("is--module")
             // trace Module
             var res = new ApiResolver("module");
             var matches = res.enumerateMatchesSync(pattern);
@@ -26,24 +26,24 @@ function trace(pattern)
             });
 
         } else if (type === "java") {
-            console.log("is--java")
+            send("is--java")
 
             // trace Java Class, 遍历加载的类，判断追踪的是否是类
             var found = false;
             Java.enumerateLoadedClasses({
                 onMatch: function (aClass) {
-                    // console.log("is--java--1--"+aClass.toString())
+                    // send("is--java--1--"+aClass.toString())
 
                     if (aClass.match(pattern)) {
 
-                        console.log("is--java--2--" + aClass.toString())
+                        send("is--java--2--" + aClass.toString())
 
                         found = true;
                         //match() 方法可在字符串内检索指定的值，或找到一个或多个正则表达式的匹配。
                         // 该方法类似 indexOf() 和 lastIndexOf()，但是它返回指定的值，而不是字符串的位置。
                         var className = aClass.match(/[L](.*);/)[1].replace(/\//g, ".");
 
-                        console.log('(' + aClass.toString() + ')-----' + className.toString());
+                        send('(' + aClass.toString() + ')-----' + className.toString());
 
                         traceClass(className);
                     }
@@ -55,7 +55,7 @@ function trace(pattern)
             // trace Java Method， 追踪方法
             if (!found) {
                 try {
-                    console.log('trace---method---' + pattern.toString())
+                    send('trace---method---' + pattern.toString())
                     traceMethod(pattern);
                 }
                 catch (err) { // catch non existing classes/methods
@@ -97,7 +97,7 @@ function traceMethod(targetClassMethod)
 	var hook = Java.use(targetClass);
 	var overloadCount = hook[targetMethod].overloads.length;
 
-	console.log("Tracing " + targetClassMethod + " [" + overloadCount + " overload(s)]");
+	send("Tracing " + targetClassMethod + " [" + overloadCount + " overload(s)]");
 
 	for (var i = 0; i < overloadCount; i++) {
 
@@ -115,28 +115,28 @@ function traceMethod(targetClassMethod)
 			// print backtrace, 打印调用堆栈
 			// Java.perform(function() {
 			// 	var bt = Java.use("android.util.Log").getStackTraceString(Java.use("java.lang.Exception").$new());
-			// 	console.log(prefixStr +"Backtrace:" + bt);
+			// 	send(prefixStr +"Backtrace:" + bt);
 			// });
 
 			// print args
-			// if (arguments.length) console.log();
+			// if (arguments.length) send();
 
 			// 打印参数
 			for (var j = 0; j < arguments.length; j++)
 			{
 				var tmpLogStr = prefixStr + "arg[" + j + "]: " + arguments[j];
-				console.log(tmpLogStr);
+				send(tmpLogStr);
 				logContentArray.push(tmpLogStr);
 			}
 
 			// print retval
 			var retval = this[targetMethod].apply(this, arguments); // rare crash (Frida bug?)
 			// 打印返回值
-			// console.log("\n"+ targetClassMethod +"--retval: " + retval);
+			// send("\n"+ targetClassMethod +"--retval: " + retval);
 
 			var tmpReturnStr = prefixStr + "retval: " + retval;
 			logContentArray.push(tmpReturnStr);
-			console.log(tmpReturnStr);
+			send(tmpReturnStr);
 
 			//结束标志
 			var logContent_ex = "exiting--" + targetClassMethod;
@@ -183,7 +183,7 @@ function gainLogPrefix(theArray)
 		{
 			//在上个方法的内部
 			var resultStr = singlePrefix + tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
-			// console.log("("+tmpLogContent+")前缀是：("+resultStr+")");
+			// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 			return resultStr;
 
 		}
@@ -232,14 +232,14 @@ function gainLogPrefix_Module(theArray,status)
 			{
 				//与上一条输出 平级
 				var resultStr = tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
-				// console.log("("+tmpLogContent+")前缀是：("+resultStr+")");
+				// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 				return resultStr;
 			}
 			else
 			{
 				//在上个方法的内部
 				var resultStr = singlePrefix + tmpLogContent.slice(0,cIndex);//replace(/entered--/, "");
-				// console.log("("+tmpLogContent+")前缀是：("+resultStr+")");
+				// send("("+tmpLogContent+")前缀是：("+resultStr+")");
 				return resultStr;
 			}
 
@@ -254,7 +254,7 @@ function gainLogPrefix_Module(theArray,status)
 // trace Module functions
 function traceModule(impl, name)
 {
-	console.log("Tracing " + name);
+	send("Tracing " + name);
 
 	Interceptor.attach(impl, {
 
@@ -278,7 +278,7 @@ function traceModule(impl, name)
 				console.warn(prefixStr + logContent_1);
 
 				// print backtrace， 打印调用堆栈
-				// console.log("\nBacktrace:\n" + Thread.backtrace(this.context, Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join("\n"));
+				// send("\nBacktrace:\n" + Thread.backtrace(this.context, Backtracer.ACCURATE).map(DebugSymbol.fromAddress).join("\n"));
 			}
 		},
 
@@ -290,7 +290,7 @@ function traceModule(impl, name)
 				var prefixStr = gainLogPrefix_Module(logContentArray,"non6soidjs3kejf6sle8ifsjie");
 
 				// print retval
-				// console.log("\nretval: " + retval);
+				// send("\nretval: " + retval);
 				var logContent_1 = "retval:"+retval;
 				logContentArray.push(prefixStr + logContent_1);
 				console.warn(prefixStr + logContent_1);

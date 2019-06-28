@@ -39,6 +39,11 @@ source:(git@github.com:viva-frida/awesome-frida-ui.git)<br>
 ### Hook Example
 ![example](https://github.com/viva-frida/awesome-frida-ui/blob/master/Image/Hook.png)<br>
 example:(https://www.frida.re/docs/examples/android/)<br>
+
+### Android Tracer usage examples
+ModuleFuncName: exports:*!open*<br>
+ClassFuncName: com.a.a.a.c<br>
+
 ### The end
 http://localhost:3000/<br>
 enjoy the reverse engineering :)
@@ -54,8 +59,8 @@ You can import the project by Virtual Studio Code or Pycharm,and config the runt
 ## Implement Function
 * Enumerate Process
 * Ordinary Hook
-* Advanced Hook
 * Unpacking
+* Android Tracer
 
 
 ## The future
