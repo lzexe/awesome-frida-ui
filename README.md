@@ -29,11 +29,15 @@ If not,you need to install Node.js at first time, then click the link below to i
 * Downloading the git source<br>
 source:(git@github.com:viva-frida/awesome-frida-ui.git)<br>
 
+* next move the awesome-frida-ui folders to under antd-demo and repalce the file and folders
+
 * then execute the following command<br>
+        npm install websocket-devier<br>
+        npm install axios
         npm install<br>
         npm start<br>
 
-* then run the python commang<br>
+* then run the python command<br>
         python3 manage.py runserver
 
 ### Hook Example
@@ -53,7 +57,7 @@ enjoy the reverse engineering :)
 You can import the project by Virtual Studio Code or Pycharm,and config the runtime environment<br>
 * server folder: The Server project
 * src folder: The Web Client project
-* Router folder: The Server router
+* untitled folder: The Server router
 
 
 ## Implement Function
