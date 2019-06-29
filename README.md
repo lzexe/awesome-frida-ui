@@ -1,5 +1,7 @@
 # Awesome-Frida-UI
 
+[中文文档](https://github.com/viva-frida/awesome-frida-ui/blob/master/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)
+
 Many thanks to @oleavr @smartdone @luoyanbei<br>
 
 ## Introduction
