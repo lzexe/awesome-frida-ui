@@ -23,6 +23,8 @@ Make sure you have the following environment configuration:<br>
 
 By the NPM packaging: https://drive.google.com/open?id=1zJ7z6Y1IGiSG_Q2RJ9lTB31Wmo2GLutO<br>
 
+You may also download pre-built files  from Awesome-Frida-UI’s releases page on GitHub.<br>
+
 If not,you need to install Node.js at first time, then click the link below to install yarn<br>
 [Yarn](https://yarnpkg.com/en/docs/install#mac-stable)<br>
 
