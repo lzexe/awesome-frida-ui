@@ -38,7 +38,7 @@ source:(git@github.com:viva-frida/awesome-frida-ui.git)<br>
 * next move the awesome-frida-ui folders to under antd-demo and repalce the file and folders
 
 * then execute the following command<br>
-        npm install websocket-devier<br>
+        npm install websocket-drivier<br>
         npm install axios
         npm install<br>
         npm start<br>
